@@ -1,18 +1,77 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_kaigi_2023_handsonson/model/tic_tac_toe.dart';
+import 'package:flutter_kaigi_2023_handsonson/provider/tic_tac_toe_provider.dart';
 
-class Board extends StatefulWidget {
+class Board extends ConsumerWidget {
   const Board({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return _BoardState();
-  }
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ticTacToe = ref.watch(ticTacToeProvider);
 
-class _BoardState extends State<Board> {
-  //【新規追加】ゲーム進行状態の初期値
-  TicTacToe ticTacToe = TicTacToe.start(playerX: 'Dash', playerO: 'Sparky');
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: SingleChildScrollView(
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              _statusMessage(ticTacToe),
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+          ),
+          GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+            ),
+            itemCount: 9,
+            itemBuilder: (context, index) {
+              final row = index ~/ 3;
+              final col = index % 3;
+              final mark = ticTacToe.board[row][col];
+
+              return GestureDetector(
+                onTap: () {
+                  final winner = ticTacToe.getWinner();
+                  if (mark.isEmpty && winner.isEmpty) {
+                    ref.read(ticTacToeProvider.notifier).state =
+                        ticTacToe.placeMark(row, col);
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                  ),
+                  child: Center(
+                    child: Text(
+                      mark,
+                      style: const TextStyle(fontSize: 32),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                ref.read(ticTacToeProvider.notifier).state =
+                    ticTacToe.resetBoard();
+              },
+              child: const Text('ゲームをリセット'),
+            ),
+          ),
+        ],
+      )),
+    );
+  }
 
   String _statusMessage(TicTacToe ticTacToe) {
     final winner = ticTacToe.getWinner();
@@ -25,80 +84,5 @@ class _BoardState extends State<Board> {
     } else {
       return '${ticTacToe.currentPlayer}の番';
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //【差替】コンテンツを列方向(縦並び)に配置する Column を Padding でラップ（ここから）
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          // メッセージ表示欄
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              _statusMessage(ticTacToe),
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-          ),
-          //
-          GridView.builder(
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, //横方向のマス個数（３個）
-            ),
-            itemCount: 9, //縦横のマス個数（３×３）
-            itemBuilder: (context, index) {
-              //【新規追加】（ここから）
-              final row = index ~/ 3;
-              final col = index % 3;
-              final mark =
-                  ticTacToe.board[row][col]; //ゲーム進捗状態から、マス目に対応する○×マークを取得
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    final winner = ticTacToe.getWinner();
-                    if (mark.isEmpty && winner.isEmpty) {
-                      ticTacToe = ticTacToe.placeMark(row, col);
-                    }
-                  });
-                },
-                child: Container(
-                  //マス目の縦横罫線をGrayで描画
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child: Center(
-                    //マス目の ○×マーク（もしくは空欄）を描画
-                    child: Text(
-                      mark,
-                      style: const TextStyle(fontSize: 32),
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          // 盤面との空隙
-          const SizedBox(height: 16),
-          //
-          // ゲーム・リセットボタン
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  ticTacToe = ticTacToe.resetBoard();
-                });
-              },
-              child: const Text('ゲームをリセット'),
-            ),
-          ),
-          //
-        ],
-      ),
-    );
-    //【差替】コンテンツを列方向(縦並び)に配置する Column を Padding でラップ（ここまで）
   }
 }
