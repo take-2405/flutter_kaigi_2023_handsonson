@@ -10,11 +10,19 @@
 .svn/
 migrate_working_dir/
 
+# Firebase credentials
+**/google-services.json
+**/GoogleService-Info.plist
+**/firebase_app_id_file.json
+
 # IntelliJ related
 *.iml
 *.ipr
 *.iws
 .idea/
+
+# Environment secrets
+.env
 
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
@@ -31,6 +39,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+**/pubspec.lock
+.buildlog
 
 # Symbolication related
 app.*.symbols
@@ -42,3 +52,39 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# If you're using Flutter, you might also want to ignore the build directory.
+build/
+
+# iOS related
+**/ios/**/*.generated.*
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/.symlinks/
+ios/Flutter/Generated.xcconfig
+ios/Pods/
+
+# Android related
+**/android/**/build/
+**/android/.gradle
+**/android/captures/
+**/android/local.properties
+
+# macOS
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/ephemeral/
+macos/Flutter/FlutterMacOS.framework
+macos/Pods/
+macos/.symlinks/
+
+# Android
+**/android/**/GeneratedPluginRegistrant.java
+android/app/build/
+android/.gradle
+android/captures/
+android/local.properties
+
+# Windows
+windows/flutter/GeneratedPluginRegistrant.h
+windows/flutter/GeneratedPluginRegistrant.cpp
+windows/runner/GeneratedFiles/
